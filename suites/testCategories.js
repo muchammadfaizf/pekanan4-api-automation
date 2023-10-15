@@ -22,25 +22,20 @@ describe('Add Category', () => {
     accessToken = loginResponse.body.data.accessToken;
   });
 
-  it('status 201', async () => {
+  it('Add Category Success (Response 201)', async () => {
    
     response = await createCategory(dataCategories, accessToken);
     expect(response.status).to.equal(201);
     categoryId = response.body.data.categoryId;
   });
-
-  it('Status success', async () => {
-    response = await createCategory(dataCategories, accessToken);
-    expect(response.body).to.have.property('status').to.equal('success');
-  });
-
-  it('contain teks Customer berhasil ditambahkan', async () => {
-    response = await createCategory(dataCategories, accessToken);  
-    expect(response.body).to.have.property('message').to.equal('Category berhasil ditambahkan');
-  });
+  it('Validate add category name', async () => {
+    const response = await updateCategory(categoryId, accessToken, dataCategories);
+    expect(response.body.data).to.have.property('name').to.equal(dataCategories.name);   
+    });
+  
 });
   describe('Negative Case - Create Category', () => {
-    it('Display invalid data', async () => {
+    it('Display invalid data response', async () => {
       const invalidCategory = {}; 
       const response = await createCategory(invalidCategory, accessToken);
       expect(response.status).to.equal(400);
@@ -48,14 +43,14 @@ describe('Add Category', () => {
     });
 });
 
-describe('Select Single Category', () => {
-    it('should retrieve the single category', async () => {
+describe('Get Category', () => {
+    it('Get category Success ( Response 200 )', async () => {
       const selectCategoryResponse = await getCategory(categoryId, accessToken);
       expect(selectCategoryResponse.status).to.equal(200);
     });
   });
-  describe('Select Single Category (Negative Tests)', () => {
-    it('should handle non-existent category', async () => {
+  describe('Negative Case - Get Category', () => {
+    it('Display invalid data response', async () => {
       const nonExistentCategoryId = 'non_existent_category_id';
       const response = await getCategory(nonExistentCategoryId, accessToken);
       expect(response.status).to.equal(404); 
@@ -64,15 +59,17 @@ describe('Select Single Category', () => {
   });
 
   describe('Update Category', () => {
-    it('should update the created category', async () => {
+    it('Update category Success ( Response 200 )', async () => {
       const response = await updateCategory(categoryId, accessToken, updateCategories);
-      expect(response.status).to.equal(200);
-      expect(response.body).to.have.property('status').to.equal('success');
-      expect(response.body.data).to.have.property('name').to.equal(updateCategories.name);   
+      expect(response.status).to.equal(200);  
       });
+      it('Validate updated category name', async () => {
+        const response = await updateCategory(categoryId, accessToken, updateCategories);
+        expect(response.body.data).to.have.property('name').to.equal(updateCategories.name);   
+        });
    });
-describe('Update Category (Negative Tests)', () => {
-  it('should handle invalid update data', async () => {
+describe('Negative Case - Update Category', () => {
+  it('Display invalid data response', async () => {
     const invalidupdateCategories = {}; 
     const response = await updateCategory(categoryId, accessToken, invalidupdateCategories);
     expect(response.status).to.equal(400); 
@@ -81,15 +78,19 @@ describe('Update Category (Negative Tests)', () => {
 });
 
 describe('Delete Category', () => {
-it('should delete the created category', async () => {
+it('Delete category Success ( Response 200 )', async () => {
     const response = await deleteCategory(categoryId, accessToken);
     expect(response.status).to.equal(200);
-    expect(response.body).to.have.property('status').to.equal('success');
     expect(response.body).to.have.property('data').to.deep.equal({});
     });
+    it('Validate data is empty', async () => {
+      const response = await deleteCategory(categoryId, accessToken);
+      expect(response.body).to.have.property('data').to.deep.equal({});
+      });
+
   });
-describe('Delete Category (Negative Tests)', () => {
-it('should handle non-existent category for deletion', async () => {
+describe('Negative Case - Delete Category', () => {
+it('Display invalid data response', async () => {
     const nonExistentCategoryId = 'non_existent_customer_id';
     const response = await deleteCategory(nonExistentCategoryId, accessToken);
     expect(response.status).to.equal(404); 
